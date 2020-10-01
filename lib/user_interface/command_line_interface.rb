@@ -3,6 +3,20 @@ require "tty-prompt"
 class CommandLineInterface
     attr_accessor :user, :user_choice, :restaurant_choice
     def welcome
+        string = <<LOGO 
+
+
+            ██╗xxxxx███████╗████████╗███████╗xxxx███████╗x█████╗x████████╗██╗      
+            ██║xxxxx██╔════╝╚══██╔══╝██╔════╝xxxx██╔════╝██╔══██╗╚══██╔══╝██║      
+            ██║xxxxx█████╗xxxxx██║xxx███████╗xxxx█████╗xx███████║xxx██║xxx██║      
+            ██║xxxxx██╔══╝xxxxx██║xxx╚════██║xxxx██╔══╝xx██╔══██║xxx██║xxx╚═╝      
+            ███████╗███████╗xxx██║xxx███████║xxxx███████╗██║xx██║xxx██║xxx██╗      
+            ╚══════╝╚══════╝xxx╚═╝xxx╚══════╝xxxx╚══════╝╚═╝xx╚═╝xxx╚═╝xxx╚═╝      
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx      
+
+LOGO
+        puts string 
+
         puts "The Dinner Bell's Ringing! Let's Eat!"
     end
 
@@ -20,7 +34,7 @@ class CommandLineInterface
     def get_user_function
         functions = ["Choose by Restaurant", "Choose by Menu Item", "View User Account"]
         prompt = TTY::Prompt.new
-        selection = prompt.select("What would you like to do?", functions)
+        selection = prompt.select("\nWhat would you like to do?", functions)
         if  selection == "Choose by Restaurant"
             choose_by_restaurant
         elsif selection == "Choose by Menu Item"
@@ -32,13 +46,13 @@ class CommandLineInterface
 
     def choose_by_restaurant
         prompt = TTY::Prompt.new
-        restaurant = prompt.select("Where would you like to go?", Restaurant.all.map{|item| item.name})
+        restaurant = prompt.select("\nWhere would you like to go?", Restaurant.all.map{|item| item.name})
         restaurant_choice_id(restaurant)
     end
 
     def get_food_order
         prompt = TTY::Prompt.new
-        menu_item = prompt.select("What do you have a taste for?", MenuItem.all.map{|item| item.name})
+        menu_item = prompt.select("\nWhat do you have a taste for?", MenuItem.all.map{|item| item.name})
         user_choice_id(menu_item)
     end
 
@@ -60,6 +74,7 @@ class CommandLineInterface
         account_choice = prompt.select("\nWhat would you like to do?", ["Return to Home Screen","Manage Account"])
         if account_choice == "Return to Home Screen"
             get_user_function
+            #system ("clear")
         else
             manage_user_account
         end
@@ -67,34 +82,38 @@ class CommandLineInterface
 
     def manage_user_account
         prompt = TTY::Prompt.new
-        manage_choice = prompt.select("Account Management Options:", ["Update Username", "Delete Account"])
+        manage_choice = prompt.select("\nAccount Management Options:", ["Update Username", "Delete Account", "Return to Home Screen"])
         if manage_choice == "Update Username"
             puts "Please enter a new username:"
             new_username = gets.chomp.downcase
             @user.update(name: new_username)
             puts "Updated username to: #{new_username.capitalize}"
             get_user_function
-        else
+        elsif manage_choice == "Delete Account"
             @user.destroy
             #abort
+        else 
+             get_user_function
+             #system ('clear')
         end
     end
 
     def last_call(east)
         prompt = TTY::Prompt.new
-        choice = prompt.select("Are you sure?", ["Yes","No"])
+        choice = prompt.select("\nAre you sure?", ["Yes","No"])
         if choice == "No" #loops the whole thing if they say no
-            fav = get_food_order
-            fave = user_choice_id(fav)
-            favor = restaurant_menu_item_matches(fave)
-            user_restaurants(favor)
+            get_food_order
+            # fav = get_food_order
+            # fave = user_choice_id(fav)
+            # favor = restaurant_menu_item_matches(fave)
+            # user_restaurants(favor)
         else
             account = @user
             account.update(menu_item_id: @user_choice.id)
             rest_id = Restaurant.find_by(name: east)
             account.update(restaurant_id: rest_id.id)
             #binding.pry
-            puts "Thank you for using Let's Eat!"
+            puts "Thank you for using Let's Eat!\n Enjoy your #{@user_choice.name} from #{rest_id.name}!"
         end
     end
 
@@ -118,7 +137,7 @@ class CommandLineInterface
             picks.name
         end
         prompt = TTY::Prompt.new
-        east = prompt.select("Where do you want to go?", restaurant_names)
+        east = prompt.select("\nWhere do you want to go?", restaurant_names)
         #binding.pry
         last_call(east)
     end
@@ -143,26 +162,26 @@ class CommandLineInterface
             picks.name
         end
         prompt = TTY::Prompt.new
-        west = prompt.select("What will you order there?", all_restaurant_food_items)
+        west = prompt.select("\nWhat will you order there?", all_restaurant_food_items)
         #binding.pry
-        last_call(west)
+        restaurant_last_call(west)
     end
 
-    def last_call(west)
+    def restaurant_last_call(west)
         prompt = TTY::Prompt.new
-        choice = prompt.select("Are you sure?", ["Yes","No"])
+        choice = prompt.select("\nAre you sure?", ["Yes","No"])
         if choice == "No" #loops the whole thing if they say no
-            fav = choose_by_restaurant
-            fave = restaurant_choice_id(fav)
-            favor = menu_item_restaurant_matches(fave)
-            user_menu(favor)
+            choose_by_restaurant
+            # fav = choose_by_restaurant
+            # fave = restaurant_choice_id(fav)
+            # favor = menu_item_restaurant_matches(fave)
+            # user_menu(favor)
         else
             account = @user
             account.update(restaurant_id: @restaurant_choice.id)
             menu_id = MenuItem.find_by(name: west)
             account.update(menu_item_id: menu_id.id)
-            #binding.pry
-            puts "Thank you for using Let's Eat!"
+            puts "Thank you for using Let's Eat!\n Enjoy your #{menu_id.name} from #{@restaurant_choice.name}!"
         end
     end
 end
