@@ -9,14 +9,17 @@ username = new_cli.username_input
 
 account = new_cli.find_or_create_by_name(username)
 
-menu_item = new_cli.get_food_order
+user_function = new_cli.get_user_function #Choose by restaurant, choose by menu item, or manage account
 
 
-item_id = new_cli.user_choice_id(menu_item)
+# menu_item = new_cli.get_food_order
 
-options = new_cli.restaurant_menu_item_matches(item_id)
 
-results = new_cli.user_restaurants(options)
+# item_id = new_cli.user_choice_id(menu_item)
 
-puts results
+# options = new_cli.restaurant_menu_item_matches(item_id)
+
+# results = new_cli.user_restaurants(options)
+
+# puts results
 
