@@ -43,9 +43,19 @@ class CommandLineInterface
     end
 
     def display_user_account(user_history)
-        user_last_restaurant = Restaurant.find_by(id: user_history.restaurant_id).name
-        user_last_item = MenuItem.find_by(id: user_history.menu_item_id).name
-        puts "\nUsername: #{user_history.name.capitalize}\nLast Restaurant: #{user_last_restaurant}\nLast Menu Item: #{user_last_item}\n"
+        user_last_restaurant = Restaurant.find_by(id: user_history.restaurant_id)
+        if user_history.restaurant_id != nil
+           last_place = user_last_restaurant.name
+        else
+            last_place = "Go eat!"
+        end
+        user_last_item = MenuItem.find_by(id: user_history.menu_item_id)
+        if user_history.menu_item_id != nil
+            last_item = user_last_item.name
+         else
+             last_item = "Seriously, go eat!"
+         end
+        puts "\nUsername: #{user_history.name.capitalize}\nLast Restaurant: #{last_place}\nLast Menu Item: #{last_item}\n"
         prompt = TTY::Prompt.new
         account_choice = prompt.select("\nWhat would you like to do?", ["Return to Home Screen","Manage Account"])
         if account_choice == "Return to Home Screen"
