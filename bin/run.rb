@@ -9,6 +9,8 @@ username = new_cli.username_input
 
 account = new_cli.find_or_create_by_name(username)
 
+new_cli.hungry
+
 # user_function = new_cli.get_user_function #Choose by restaurant, choose by menu item, or manage account
 
 
