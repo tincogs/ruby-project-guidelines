@@ -1,7 +1,7 @@
 require "tty-prompt"
 
 class CommandLineInterface
-    attr_accessor :user, :user_choice
+    attr_accessor :user, :user_choice, :restaurant_choice
     def welcome
         puts "The Dinner Bell's Ringing! Let's Eat!"
     end
@@ -14,6 +14,7 @@ class CommandLineInterface
     def find_or_create_by_name(username)
         @user = User.find_or_create_by(name: username)
         puts "Welcome to Let's Eat #{user.name.capitalize}!"
+        get_user_function
     end
 
     def get_user_function
@@ -31,7 +32,8 @@ class CommandLineInterface
 
     def choose_by_restaurant
         prompt = TTY::Prompt.new
-        prompt.select("Where would you like to go?", Restaurant.all.map{|item| item.name})
+        restaurant = prompt.select("Where would you like to go?", Restaurant.all.map{|item| item.name})
+        restaurant_choice_id(restaurant)
     end
 
     def get_food_order
@@ -67,6 +69,7 @@ class CommandLineInterface
             #abort
         end
     end
+
     def last_call(east)
         prompt = TTY::Prompt.new
         choice = prompt.select("Are you sure?", ["Yes","No"])
@@ -110,4 +113,46 @@ class CommandLineInterface
         last_call(east)
     end
 
+    def restaurant_choice_id(restaurant)
+        @restaurant_choice = Restaurant.find_by(name: restaurant)
+        choice_id = restaurant_choice.id
+        menu_item_restaurant_matches(choice_id)
+    end
+
+    def menu_item_restaurant_matches(restaurant_choice_input)
+        matches = RestaurantMenuItem.where(restaurant_id: restaurant_choice_input).limit(100)
+        results = matches.map do |match|
+            match.menu_item_id
+        end
+        user_menu(results)
+    end
+
+    def user_menu(match)
+        menu_options = MenuItem.where(id: match).limit(100)
+        all_restaurant_food_items = menu_options.map do |picks|
+            picks.name
+        end
+        prompt = TTY::Prompt.new
+        west = prompt.select("What will you order there?", all_restaurant_food_items)
+        #binding.pry
+        last_call(west)
+    end
+
+    def last_call(west)
+        prompt = TTY::Prompt.new
+        choice = prompt.select("Are you sure?", ["Yes","No"])
+        if choice == "No" #loops the whole thing if they say no
+            fav = choose_by_restaurant
+            fave = restaurant_choice_id(fav)
+            favor = menu_item_restaurant_matches(fave)
+            user_menu(favor)
+        else
+            account = @user
+            account.update(restaurant_id: @restaurant_choice.id)
+            menu_id = MenuItem.find_by(name: west)
+            account.update(menu_item_id: menu_id.id)
+            #binding.pry
+            puts "Thank you for using Let's Eat!"
+        end
+    end
 end
