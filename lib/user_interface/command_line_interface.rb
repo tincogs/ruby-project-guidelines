@@ -1,7 +1,7 @@
 require "tty-prompt"
 
 class CommandLineInterface
-    attr_accessor :user, :user_choice, :restaurant_choice
+    attr_accessor :user, :user_choice, :restaurant_choice, :string
     def welcome
         string = <<LOGO 
 
@@ -15,26 +15,27 @@ class CommandLineInterface
             xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx      
 
 LOGO
-        puts string.colorize(:color => :black, :background => :yellow) 
+        puts string.colorize(:color => :black, :background => :yellow).blink 
 
-        puts "The Dinner Bell's Ringing! Let's Eat!"
+        puts "The Dinner Bell's Ringing! Let's Eat!".underline
     end
 
     def username_input
-        puts "Please enter a username:"
+        puts "\nPlease enter a username:" 
         username = gets.chomp.downcase
     end
 
     def find_or_create_by_name(username)
         @user = User.find_or_create_by(name: username)
-        puts "Welcome to Let's Eat #{user.name.capitalize}!"
+        puts "Welcome to Let's Eat #{user.name.capitalize}!".underline
         get_user_function
+        system 'clear'
     end
 
     def get_user_function
         functions = ["Choose by Restaurant", "Choose by Menu Item", "View User Account"]
         prompt = TTY::Prompt.new
-        selection = prompt.select("\nWhat would you like to do?", functions)
+        selection = prompt.select("\nWhat would you like to do?".underline, functions)
         if  selection == "Choose by Restaurant"
             choose_by_restaurant
         elsif selection == "Choose by Menu Item"
@@ -42,18 +43,21 @@ LOGO
         else selection == "View User Account"
             display_user_account(@user)
         end
+        system `clear`
     end
 
     def choose_by_restaurant
         prompt = TTY::Prompt.new
-        restaurant = prompt.select("\nWhere would you like to go?", Restaurant.all.map{|item| item.name})
+        restaurant = prompt.select("\nWhere would you like to go?".underline, Restaurant.all.map{|item| item.name})
         restaurant_choice_id(restaurant)
+        system 'clear'
     end
 
     def get_food_order
         prompt = TTY::Prompt.new
-        menu_item = prompt.select("\nWhat do you have a taste for?", MenuItem.all.map{|item| item.name})
+        menu_item = prompt.select("\nWhat do you have a taste for?".underline, MenuItem.all.map{|item| item.name})
         user_choice_id(menu_item)
+        system 'clear'
     end
 
     def display_user_account(user_history)
@@ -66,18 +70,19 @@ LOGO
         user_last_item = MenuItem.find_by(id: user_history.menu_item_id)
         if user_history.menu_item_id != nil
             last_item = user_last_item.name
-         else
-             last_item = "Seriously, go eat!"
-         end
-        puts "\nUsername: #{user_history.name.capitalize}\nLast Restaurant: #{last_place}\nLast Menu Item: #{last_item}\n"
+        else
+            last_item = "Seriously, go eat!"
+        end
+        puts "\nUsername: #{user_history.name.capitalize}\nLast Restaurant: #{last_place}\nLast Menu Item: #{last_item}\n".underline
         prompt = TTY::Prompt.new
         account_choice = prompt.select("\nWhat would you like to do?", ["Return to Home Screen","Manage Account"])
         if account_choice == "Return to Home Screen"
-            get_user_function
-            #system ("clear")                                                                                                                                 
+            get_user_function   
+            system 'clear'                                                                                                                              
         else
             manage_user_account
         end
+        system 'clear'
     end
 
     def manage_user_account
@@ -94,8 +99,8 @@ LOGO
             #abort
         else 
              get_user_function
-             #system ('clear')
         end
+        system 'clear'
     end
 
     def last_call(east)
@@ -108,8 +113,9 @@ LOGO
             account.update(menu_item_id: @user_choice.id)
             rest_id = Restaurant.find_by(name: east)
             account.update(restaurant_id: rest_id.id)
-            puts "Thank you for using Let's Eat!\n Enjoy your #{@user_choice.name} from #{rest_id.name}!"
+            puts "Thank you for using Let's Eat!\n Enjoy your #{@user_choice.name} from #{rest_id.name}!".underline
         end
+        system 'clear'
     end
 
     def user_choice_id(menu_item)
@@ -132,9 +138,10 @@ LOGO
             picks.name
         end
         prompt = TTY::Prompt.new
-        east = prompt.select("\nWhere do you want to go?", restaurant_names)
+        east = prompt.select("\nWhere do you want to go?".underline, restaurant_names)
         #binding.pry
         last_call(east)
+        system 'clear'
     end
 
     def restaurant_choice_id(restaurant)
@@ -157,14 +164,15 @@ LOGO
             picks.name
         end
         prompt = TTY::Prompt.new
-        west = prompt.select("\nWhat will you order there?", all_restaurant_food_items)
+        west = prompt.select("\nWhat will you order there?".underline, all_restaurant_food_items)
         #binding.pry
         restaurant_last_call(west)
+        system 'clear'
     end
 
     def restaurant_last_call(west)
         prompt = TTY::Prompt.new
-        choice = prompt.select("\nAre you sure?", ["Yes","No"])
+        choice = prompt.select("\nAre you sure?".underline, ["Yes","No"])
         if choice == "No" #loops the whole thing if they say no
             choose_by_restaurant
         else
@@ -172,7 +180,7 @@ LOGO
             account.update(restaurant_id: @restaurant_choice.id)
             menu_id = MenuItem.find_by(name: west)
             account.update(menu_item_id: menu_id.id)
-            puts "Thank you for using Let's Eat!\n Enjoy your #{menu_id.name} from #{@restaurant_choice.name}!"
+            puts "Thank you for using Let's Eat!\n Enjoy your #{menu_id.name} from #{@restaurant_choice.name}!".underline
         end
     end
 
@@ -229,6 +237,6 @@ s...-/+y:    -+ooo++++//////::::/oso+++++//++++/+////+++osoo//+o:`-s///++++ooo:`
                                                                  /+:/o`                             
                                                                   --.    
 LOGO
-        puts string
+        puts string.colorize(:color => :black, :background => :yellow).blink
     end
 end
