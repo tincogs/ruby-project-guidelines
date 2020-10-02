@@ -15,7 +15,7 @@ class CommandLineInterface
             xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx      
 
 LOGO
-        puts string 
+        puts string.colorize(:color => :black, :background => :yellow) 
 
         puts "The Dinner Bell's Ringing! Let's Eat!"
     end
@@ -74,7 +74,7 @@ LOGO
         account_choice = prompt.select("\nWhat would you like to do?", ["Return to Home Screen","Manage Account"])
         if account_choice == "Return to Home Screen"
             get_user_function
-            #system ("clear")
+            #system ("clear")                                                                                                                                 
         else
             manage_user_account
         end
@@ -103,16 +103,11 @@ LOGO
         choice = prompt.select("\nAre you sure?", ["Yes","No"])
         if choice == "No" #loops the whole thing if they say no
             get_food_order
-            # fav = get_food_order
-            # fave = user_choice_id(fav)
-            # favor = restaurant_menu_item_matches(fave)
-            # user_restaurants(favor)
         else
             account = @user
             account.update(menu_item_id: @user_choice.id)
             rest_id = Restaurant.find_by(name: east)
             account.update(restaurant_id: rest_id.id)
-            #binding.pry
             puts "Thank you for using Let's Eat!\n Enjoy your #{@user_choice.name} from #{rest_id.name}!"
         end
     end
@@ -172,10 +167,6 @@ LOGO
         choice = prompt.select("\nAre you sure?", ["Yes","No"])
         if choice == "No" #loops the whole thing if they say no
             choose_by_restaurant
-            # fav = choose_by_restaurant
-            # fave = restaurant_choice_id(fav)
-            # favor = menu_item_restaurant_matches(fave)
-            # user_menu(favor)
         else
             account = @user
             account.update(restaurant_id: @restaurant_choice.id)
