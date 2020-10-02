@@ -3,25 +3,25 @@ require "tty-prompt"
 class CommandLineInterface
     attr_accessor :user, :user_choice, :restaurant_choice, :string
     def welcome
-        string = <<LOGO 
+        string = <<LOGO
 
 
-            ██╗xxxxx███████╗████████╗███████╗xxxx███████╗x█████╗x████████╗██╗      
-            ██║xxxxx██╔════╝╚══██╔══╝██╔════╝xxxx██╔════╝██╔══██╗╚══██╔══╝██║      
-            ██║xxxxx█████╗xxxxx██║xxx███████╗xxxx█████╗xx███████║xxx██║xxx██║      
-            ██║xxxxx██╔══╝xxxxx██║xxx╚════██║xxxx██╔══╝xx██╔══██║xxx██║xxx╚═╝      
-            ███████╗███████╗xxx██║xxx███████║xxxx███████╗██║xx██║xxx██║xxx██╗      
-            ╚══════╝╚══════╝xxx╚═╝xxx╚══════╝xxxx╚══════╝╚═╝xx╚═╝xxx╚═╝xxx╚═╝      
-            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx      
+            ██╗xxxxx███████╗████████╗███████╗xxxx███████╗x█████╗x████████╗██╗
+            ██║xxxxx██╔════╝╚══██╔══╝██╔════╝xxxx██╔════╝██╔══██╗╚══██╔══╝██║
+            ██║xxxxx█████╗xxxxx██║xxx███████╗xxxx█████╗xx███████║xxx██║xxx██║
+            ██║xxxxx██╔══╝xxxxx██║xxx╚════██║xxxx██╔══╝xx██╔══██║xxx██║xxx╚═╝
+            ███████╗███████╗xxx██║xxx███████║xxxx███████╗██║xx██║xxx██║xxx██╗
+            ╚══════╝╚══════╝xxx╚═╝xxx╚══════╝xxxx╚══════╝╚═╝xx╚═╝xxx╚═╝xxx╚═╝
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 LOGO
-        puts string.colorize(:color => :black, :background => :yellow).blink 
+        puts string.colorize(:color => :black, :background => :yellow).blink
 
         puts "The Dinner Bell's Ringing! Let's Eat!".underline
     end
 
     def username_input
-        puts "\nPlease enter a username:" 
+        puts "\nPlease enter a username:"
         username = gets.chomp.downcase
     end
 
@@ -29,7 +29,7 @@ LOGO
         @user = User.find_or_create_by(name: username)
         puts "Welcome to Let's Eat #{user.name.capitalize}!".underline
         get_user_function
-        system 'clear'
+        # system 'clear'
     end
 
     def get_user_function
@@ -43,21 +43,21 @@ LOGO
         else selection == "View User Account"
             display_user_account(@user)
         end
-        system `clear`
+        # system 'clear'
     end
 
     def choose_by_restaurant
         prompt = TTY::Prompt.new
         restaurant = prompt.select("\nWhere would you like to go?".underline, Restaurant.all.map{|item| item.name})
         restaurant_choice_id(restaurant)
-        system 'clear'
+        # system 'clear'
     end
 
     def get_food_order
         prompt = TTY::Prompt.new
         menu_item = prompt.select("\nWhat do you have a taste for?".underline, MenuItem.all.map{|item| item.name})
         user_choice_id(menu_item)
-        system 'clear'
+        # system 'clear'
     end
 
     def display_user_account(user_history)
@@ -77,12 +77,12 @@ LOGO
         prompt = TTY::Prompt.new
         account_choice = prompt.select("\nWhat would you like to do?", ["Return to Home Screen","Manage Account"])
         if account_choice == "Return to Home Screen"
-            get_user_function   
-            system 'clear'                                                                                                                              
+            get_user_function
+            # system 'clear'
         else
             manage_user_account
         end
-        system 'clear'
+        # system 'clear'
     end
 
     def manage_user_account
@@ -97,10 +97,10 @@ LOGO
         elsif manage_choice == "Delete Account"
             @user.destroy
             #abort
-        else 
+        else
              get_user_function
         end
-        system 'clear'
+        # system 'clear'
     end
 
     def last_call(east)
@@ -115,7 +115,7 @@ LOGO
             account.update(restaurant_id: rest_id.id)
             puts "Thank you for using Let's Eat!\n Enjoy your #{@user_choice.name} from #{rest_id.name}!".underline
         end
-        system 'clear'
+        # system 'clear'
     end
 
     def user_choice_id(menu_item)
@@ -141,7 +141,7 @@ LOGO
         east = prompt.select("\nWhere do you want to go?".underline, restaurant_names)
         #binding.pry
         last_call(east)
-        system 'clear'
+        # system 'clear'
     end
 
     def restaurant_choice_id(restaurant)
@@ -167,7 +167,7 @@ LOGO
         west = prompt.select("\nWhat will you order there?".underline, all_restaurant_food_items)
         #binding.pry
         restaurant_last_call(west)
-        system 'clear'
+        # system 'clear'
     end
 
     def restaurant_last_call(west)
@@ -180,63 +180,64 @@ LOGO
             account.update(restaurant_id: @restaurant_choice.id)
             menu_id = MenuItem.find_by(name: west)
             account.update(menu_item_id: menu_id.id)
-            puts "Thank you for using Let's Eat!\n Enjoy your #{menu_id.name} from #{@restaurant_choice.name}!".underline
+            signoff = "Thank you for using Let's Eat!\n Enjoy your #{menu_id.name} from #{@restaurant_choice.name}!"
+            puts signoff.underline
         end
     end
 
     def hungry
         string = <<LOGO
-                                       ```.............``                                          
-                                ``.--::::::-:--------::::::--..`                                   
-                            `.-::::----....``````````.....---::::-.`                               
-                        `.-::::--..`````                `````..---:::-.`                           
-                    .-:::--.```````````````  `    ``````````````.--:::-.`                        
-                `-:::--.``````````````````````````````````````````.--:::-`                      
-/--.`          `-:::-.````````````````````````````````````````````````.-::/:`  `++`  -//:   ++`  
-y--://-`     `-//:-..```````````````````````````````````````````````````.-://:`-hh.  ooos   dh:  
-s````.:+/`  .//::....```````````````````````````````````````````````````...-://oyh`  o+/s   hy+  
-y`    `./o-://:-.......```````````````````````````````````````````````......-:/ysy`  s//y   hss  
-y`     `.:so/:.....................``````````````````````.....................:yoy:  y/:y  `hoy  
-y`      `./y:-.............../syyy+-....................-+syys/................y+so:`y::h  .y+y  
-y.`     `.-+s-..............sdhhhhhh/..................:ydhhhhhs-.............-y+oo+:h--y. -s+y  
-y.`      `-:y:-............ohhyyyyyhh-................-yhyyyyyyhs............--y/+s/oy-.s: +o/y  
-y.`      `.:oo---.........-hyysssssyy+................/hyyssssyyh-..........---y/:s+so.`+o`s::y  
-y.`      `.:os-------.....-yysssssssyo................oyssssssssy:.......------s/.:+o:` -++:.:y  
-s.`      `-:os---------...-yysssssssyo................+yssssssssy:.....--------s+.```    ````+s  
-y.`     `.-/os------------.sysssssssy:................-yyssssssys.-------------/so-`      `-oo.  
-y.`      `.:os-------.....-yysssssssyo................oyssssssssy:.......------s/.:+o:` -++:.:y  
-s.`      `-:os---------...-yysssssssyo................+yssssssssy:.....--------s+.```    ````+s  
-y.`     `.-/os------------.sysssssssy:................-yyssssssys.-------------/so-`      `-oo.  
-y.`     `.:/y+::----------.-yyysssyy+................../yyyssyyy:.-----------::::+s+.    -ss:    
-y-.``  `.-/+h:::::-----------+yyyys:.................--.:syyyyo------------:::::::/ss.  -yo      
-y:---.`.-:+yo:::::::---------..-:-.----------------------.-:-..----------:::::::://+y- `:d:      
-y///::--:/sy//::::::::--------------------------------------------------:::::::////+h- `/d-      
-y///////+oy////:::::::::----------------------------------------------:::::::://///+y- `/d:      
-y:-:///+sy/////:::::::::---------------------------------------------:::::::://////oy. ./d/      
-y-.-:/+oh/////::hhyso+/:--------------------------------------------:/+osyhh/://///os. ./h/      
-y.`.-/+oh/////::mddddddddhyysoo+++///::::----------::::///+++oosyhhddddddddd+://///so` .:yo      
-y.`.-/+sh//////-hdhs:://+ossyhhdddddddddddddddddddddddddddddhhyysso++//:ohhd-//////y+` .:ys      
-y.`.-/+sh+/////:+dhy....```......--:://///+++++++////:::--............--ohdo://////y/` `:sh      
-y.`.-/+sy+//////-shh+...````````````                      ````````....-/hhy-//////+h:  `:od      
-y.`.-/+sy++/////:-yyys+/-.``````````                      ```````.-:/osyyy:://///++h-  `-+d`     
-y.`.-/+sh+++/////::yysyyyyso/::-..```                 ```..--:/+osyyyysyy:://///++oy-  `-+h-     
-s.`.-/+sy++++/////::ssooossssysssssssssooooooooooooossssssssyysssssoooss:://////++ss.  `-/h/     
-s.`.-/+syo++++/////:-osooooooooooosyyyyyyyyyyysyyyyyyyyyysoooooooooooso:://///++++so`   ./y+     
-s.`.-/+syoo++++/////:-/sooooooooooyysssssssssyyssssssssssyoooooooooos/:://///++++oy+`   .:ss     
-s.`.-/+so/ooo+++/////:::+sooooooooysooooooooossoooooooossysooooooos+::://///++++ooy/`   `:oy     
-s``.-/+s+ -ooo++++/////:::+oooo++ossoo++++++ooso+++++ooosssooo+/::+/://////+++ooo:s/`   `-oh     
-y.`.-/+s+  `/ooo+++//////:::/+oooosoo++++++++oo++++++++ooso+++/:. `s/////+++ooo+. s/`   `-oh     
-s...-/+y:    -+ooo++++//////::::/oso+++++//++++/+////+++osoo//+o:`-s///++++ooo:`  +o.   `:so     
-   :+://+o+      `-+ooo++++////////:/so++////////////////++osyo///o+.+s++++oooo:`    `/+:::+o+`     
-    `----`         `-+oooo+++++//////so++////////////////++osys///o+:oo++ooo+:`        `.---`       
-                      ./ooooo+++++++/+sso+++//////////+++oososs+++s//soooo/.`                       
-                        `-/ooooooo+++++ssssoooooooooooossss++++++os::yo/-`                          
-                            .:+ooooooooooosssyssssssyssssoooooooos+--s`                             
-                                .-:+oooooooooooossoooooooososo+/-+/..+-                             
-                                     `.--://++++++++++//:--.`    +:``+:                             
-                                                                 /+:/o`                             
-                                                                  --.    
+                                       ```.............``
+                                ``.--::::::-:--------::::::--..`
+                            `.-::::----....``````````.....---::::-.`
+                        `.-::::--..`````                `````..---:::-.`
+                    .-:::--.```````````````  `    ``````````````.--:::-.`
+                `-:::--.``````````````````````````````````````````.--:::-`
+/--.`          `-:::-.````````````````````````````````````````````````.-::/:`  `++`  -//:   ++`
+y--://-`     `-//:-..```````````````````````````````````````````````````.-://:`-hh.  ooos   dh:
+s````.:+/`  .//::....```````````````````````````````````````````````````...-://oyh`  o+/s   hy+
+y`    `./o-://:-.......```````````````````````````````````````````````......-:/ysy`  s//y   hss
+y`     `.:so/:.....................``````````````````````.....................:yoy:  y/:y  `hoy
+y`      `./y:-.............../syyy+-....................-+syys/................y+so:`y::h  .y+y
+y.`     `.-+s-..............sdhhhhhh/..................:ydhhhhhs-.............-y+oo+:h--y. -s+y
+y.`      `-:y:-............ohhyyyyyhh-................-yhyyyyyyhs............--y/+s/oy-.s: +o/y
+y.`      `.:oo---.........-hyysssssyy+................/hyyssssyyh-..........---y/:s+so.`+o`s::y
+y.`      `.:os-------.....-yysssssssyo................oyssssssssy:.......------s/.:+o:` -++:.:y
+s.`      `-:os---------...-yysssssssyo................+yssssssssy:.....--------s+.```    ````+s
+y.`     `.-/os------------.sysssssssy:................-yyssssssys.-------------/so-`      `-oo.
+y.`      `.:os-------.....-yysssssssyo................oyssssssssy:.......------s/.:+o:` -++:.:y
+s.`      `-:os---------...-yysssssssyo................+yssssssssy:.....--------s+.```    ````+s
+y.`     `.-/os------------.sysssssssy:................-yyssssssys.-------------/so-`      `-oo.
+y.`     `.:/y+::----------.-yyysssyy+................../yyyssyyy:.-----------::::+s+.    -ss:
+y-.``  `.-/+h:::::-----------+yyyys:.................--.:syyyyo------------:::::::/ss.  -yo
+y:---.`.-:+yo:::::::---------..-:-.----------------------.-:-..----------:::::::://+y- `:d:
+y///::--:/sy//::::::::--------------------------------------------------:::::::////+h- `/d-
+y///////+oy////:::::::::----------------------------------------------:::::::://///+y- `/d:
+y:-:///+sy/////:::::::::---------------------------------------------:::::::://////oy. ./d/
+y-.-:/+oh/////::hhyso+/:--------------------------------------------:/+osyhh/://///os. ./h/
+y.`.-/+oh/////::mddddddddhyysoo+++///::::----------::::///+++oosyhhddddddddd+://///so` .:yo
+y.`.-/+sh//////-hdhs:://+ossyhhdddddddddddddddddddddddddddddhhyysso++//:ohhd-//////y+` .:ys
+y.`.-/+sh+/////:+dhy....```......--:://///+++++++////:::--............--ohdo://////y/` `:sh
+y.`.-/+sy+//////-shh+...````````````                      ````````....-/hhy-//////+h:  `:od
+y.`.-/+sy++/////:-yyys+/-.``````````                      ```````.-:/osyyy:://///++h-  `-+d`
+y.`.-/+sh+++/////::yysyyyyso/::-..```                 ```..--:/+osyyyysyy:://///++oy-  `-+h-
+s.`.-/+sy++++/////::ssooossssysssssssssooooooooooooossssssssyysssssoooss:://////++ss.  `-/h/
+s.`.-/+syo++++/////:-osooooooooooosyyyyyyyyyyysyyyyyyyyyysoooooooooooso:://///++++so`   ./y+
+s.`.-/+syoo++++/////:-/sooooooooooyysssssssssyyssssssssssyoooooooooos/:://///++++oy+`   .:ss
+s.`.-/+so/ooo+++/////:::+sooooooooysooooooooossoooooooossysooooooos+::://///++++ooy/`   `:oy
+s``.-/+s+ -ooo++++/////:::+oooo++ossoo++++++ooso+++++ooosssooo+/::+/://////+++ooo:s/`   `-oh
+y.`.-/+s+  `/ooo+++//////:::/+oooosoo++++++++oo++++++++ooso+++/:. `s/////+++ooo+. s/`   `-oh
+s...-/+y:    -+ooo++++//////::::/oso+++++//++++/+////+++osoo//+o:`-s///++++ooo:`  +o.   `:so
+   :+://+o+      `-+ooo++++////////:/so++////////////////++osyo///o+.+s++++oooo:`    `/+:::+o+`
+    `----`         `-+oooo+++++//////so++////////////////++osys///o+:oo++ooo+:`        `.---`
+                      ./ooooo+++++++/+sso+++//////////+++oososs+++s//soooo/.`
+                        `-/ooooooo+++++ssssoooooooooooossss++++++os::yo/-`
+                            .:+ooooooooooosssyssssssyssssoooooooos+--s`
+                                .-:+oooooooooooossoooooooososo+/-+/..+-
+                                     `.--://++++++++++//:--.`    +:``+:
+                                                                 /+:/o`
+                                                                  --.
 LOGO
-        puts string.colorize(:color => :black, :background => :yellow).blink
+        puts string.colorize(:color => :yellow)
     end
 end

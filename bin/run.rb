@@ -9,6 +9,6 @@ username = new_cli.username_input
 system 'clear'
 
 new_cli.welcome
-account = new_cli.find_or_create_by_name(username)
+new_cli.find_or_create_by_name(username)
 
 new_cli.hungry
